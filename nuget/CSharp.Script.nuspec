@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>CSharp.Script</id>
+    <version>2018.12.27.1</version>
+    <title>CSharp.Script</title>
+    <authors>ihtfw</authors>
+    <owners>ihtfw</owners>
+    <projectUrl>https://github.com/ihtfw/CSharp.Script</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/ihtfw/Logazmic/master/docs/nuget.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Simple library, that helps with runtime compiling and executing</description>
+  </metadata>
+  <files>
+    <file src="..\src\CSharp.Script\bin\Release\CSharp.Script.dll" target="lib\net45\" />
+    <file src="..\src\CSharp.Script\bin\Release\CSharp.Script.pdb" target="lib\net45\" />
+    <file src="..\src\CSharp.Script\bin\Release\CSharp.Script.XML" target="lib\net45\" />
+  </files>
+</package>
