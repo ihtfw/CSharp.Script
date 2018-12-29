@@ -51,6 +51,7 @@
     <Compile Include="Compile\CacheCompiler.cs" />
     <Compile Include="Compile\CompilerBuilder.cs" />
     <Compile Include="Compile\ICompiler.cs" />
+    <Compile Include="Exceptions\AlreadyExistsException.cs" />
     <Compile Include="Exceptions\CompileException.cs" />
     <Compile Include="Exceptions\ScriptFieldNotFoundException.cs" />
     <Compile Include="Exceptions\ScriptMethodNotFoundException.cs" />

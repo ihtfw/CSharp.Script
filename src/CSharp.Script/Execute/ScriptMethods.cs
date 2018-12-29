@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using CSharp.Script.Exceptions;
 
 namespace CSharp.Script.Execute
@@ -9,8 +11,14 @@ namespace CSharp.Script.Execute
 
         public ScriptMethods(object scriptObject)
         {
-            foreach (var methodInfo in scriptObject.GetType().GetMethods())
+            foreach (var methodInfo in scriptObject.GetType()
+                .GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
+                .Where(m => !m.IsSpecialName))
             {
+                if (_scriptMethods.ContainsKey(methodInfo.Name))
+                {
+                    throw new AlreadyExistsException($"Method {methodInfo.Name} already added");
+                }
                 _scriptMethods.Add(methodInfo.Name, new ScriptMethod(scriptObject, methodInfo));
             }
         }

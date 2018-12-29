@@ -12,6 +12,10 @@ namespace CSharp.Script.Execute
         {
             foreach (var propertyInfo in scriptObject.GetType().GetProperties())
             {
+                if (_scriptProperties.ContainsKey(propertyInfo.Name))
+                {
+                    throw new AlreadyExistsException($"Property {propertyInfo.Name} already added");
+                }
                 _scriptProperties.Add(propertyInfo.Name, new ScriptProperty(scriptObject, propertyInfo));
             }
         }

@@ -12,6 +12,10 @@ namespace CSharp.Script.Execute
         {
             foreach (var fieldInfo in scriptObject.GetType().GetFields())
             {
+                if (_scriptFields.ContainsKey(fieldInfo.Name))
+                {
+                    throw new AlreadyExistsException($"Field {fieldInfo.Name} already added");
+                }
                 _scriptFields.Add(fieldInfo.Name, new ScriptField(scriptObject, fieldInfo));
             }
         }
