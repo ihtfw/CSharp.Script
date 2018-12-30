@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Reflection;
 using System.Text;
 using CSharp.Script.Compile;
@@ -46,6 +45,8 @@ namespace CSharp.Script.Tests.Compile
             sourceCodeBuilder.AppendLine(@"public string StringField;");
 
             var assembly = compiler.Compile(sourceCodeBuilder.ToString());
+
+            Console.WriteLine(compiler.BuildFullSourceCode(sourceCodeBuilder.ToString()));
         }
 
         [Test]

@@ -14,7 +14,7 @@ namespace CSharp.Script.Compile
         }
 
         /// <inheritdoc />
-        public Assembly Compile(string sourceCode)
+        public virtual Assembly Compile(string sourceCode)
         {
             lock (_cache)
             {
@@ -37,7 +37,7 @@ namespace CSharp.Script.Compile
         }
 
         /// <inheritdoc />
-        public string BuildFullSourceCode(string sourceCode)
+        public virtual string BuildFullSourceCode(string sourceCode)
         {
             return _compiler.BuildFullSourceCode(sourceCode);
         }

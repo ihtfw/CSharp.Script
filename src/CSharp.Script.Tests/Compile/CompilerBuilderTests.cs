@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using CSharp.Script.Compile;
 using CSharp.Script.Execute;
 using NUnit.Framework;
@@ -15,13 +11,19 @@ namespace CSharp.Script.Tests.Compile
         [Test]
         public void BuildTest()
         {
+            var sourceCode = @"public string Foo(){ return ""Hello World!""; }";
+
             var compilerBuilder = new CompilerBuilder();
             var compiler = compilerBuilder.Build();
-            var assembly = compiler.Compile(@"public string Foo(){ return ""Hello World!""; }");
+            
+            var assembly = compiler.Compile(sourceCode);
+            Console.WriteLine(compiler.BuildFullSourceCode(sourceCode));
             var scriptContainer = new ScriptContainer(assembly);
             var returnValue = scriptContainer.Methods.Get("Foo").Invoke<string>();
 
             Assert.AreEqual("Hello World!", returnValue);
+
+
         }
 
         [Test]

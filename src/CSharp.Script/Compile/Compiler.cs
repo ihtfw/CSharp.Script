@@ -1,7 +1,6 @@
 ﻿using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -10,7 +9,6 @@ using Microsoft.CSharp;
 
 namespace CSharp.Script.Compile
 {
-
     public class Compiler : ICompiler
     {
         private readonly UniqueNameGenerator _uniqueNameGenerator = new UniqueNameGenerator();
@@ -35,30 +33,33 @@ namespace CSharp.Script.Compile
             {
                 GenerateInMemory = true
             };
-
-            _parameters.ReferencedAssemblies.Add(Assembly.GetAssembly(typeof(Enumerable)).Location);
-            _parameters.ReferencedAssemblies.Add(Assembly.GetAssembly(typeof(File)).Location);
-            _parameters.ReferencedAssemblies.Add(Assembly.GetAssembly(typeof(List<>)).Location);
-            _parameters.ReferencedAssemblies.Add(Assembly.GetAssembly(typeof(StringBuilder)).Location);
-
+            
             _parameters.ReferencedAssemblies.AddRange(References.Select(a => a.Location).ToArray());
         }
 
         /// <inheritdoc />
-        public Assembly Compile(string sourceCode)
+        public virtual Assembly Compile(string sourceCode)
         {
             var fullSourceCode = BuildFullSourceCode(sourceCode);
             CompilerResults results = _codeProvider.CompileAssemblyFromSource(_parameters, fullSourceCode);
 
             if (results.Errors.Count > 0)
             {
+                var compileErrors = new List<CompileError>();
                 string errors = "";
                 foreach (CompilerError compErr in results.Errors)
                 {
-                    errors += "Line number " + compErr.Line + ", Error Number: " + compErr.ErrorNumber + ", '" + compErr.ErrorText + ";" + Environment.NewLine + Environment.NewLine;
+                    if (!compErr.IsWarning)
+                    {
+                        errors += "Line number " + compErr.Line + ", Error Number: " + compErr.ErrorNumber + ", '" + compErr.ErrorText + ";" + Environment.NewLine + Environment.NewLine;
+                        compileErrors.Add(new CompileError(compErr));
+                    }
                 }
 
-                throw new CompileException(errors, sourceCode, fullSourceCode);
+                if (compileErrors.Any())
+                {
+                    throw new CompileException(errors, compileErrors, sourceCode, fullSourceCode);
+                }
             }
 
             var compiledAssembly = results.CompiledAssembly;
@@ -66,7 +67,7 @@ namespace CSharp.Script.Compile
         }
 
         /// <inheritdoc />
-        public string BuildFullSourceCode(string sourceCode)
+        public virtual string BuildFullSourceCode(string sourceCode)
         {
             string extendsClass = null;
             if (sourceCode.StartsWith("extends"))
@@ -81,11 +82,6 @@ namespace CSharp.Script.Compile
             }
 
             var sb = new StringBuilder();
-            sb.AppendLine("using System;");
-            sb.AppendLine("using System.Text;");
-            sb.AppendLine("using System.IO;");
-            sb.AppendLine("using System.Linq;");
-            sb.AppendLine("using System.Collections.Generic;");
 
             foreach (var @using in Usings)
             {

@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Compile\CacheCompiler.cs" />
+    <Compile Include="Compile\CompileError.cs" />
     <Compile Include="Compile\CompilerBuilder.cs" />
     <Compile Include="Compile\ICompiler.cs" />
     <Compile Include="Exceptions\AlreadyExistsException.cs" />
