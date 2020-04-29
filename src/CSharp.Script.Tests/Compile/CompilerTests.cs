@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 using CSharp.Script.Compile;
 using CSharp.Script.Exceptions;
 using NUnit.Framework;
@@ -80,6 +81,32 @@ namespace CSharp.Script.Tests.Compile
             Assert.Throws<CompileException>(() =>
             {
                 compiler.Compile("vpiruvnqeru9");
+            });
+        }
+
+        [Test]
+        public void BaseTempDir()
+        {
+            var dir = TestContext.CurrentContext.WorkDirectory;
+            var compiler = new Compiler
+            {
+                BaseTempDir = dir
+            };
+            Console.WriteLine(dir);
+            var assembly = compiler.Compile(@"public string Foo(){ return ""HelloWorld""; }");
+        }
+
+        /// <summary>
+        /// bugfix of same file name on recompilation
+        /// </summary>
+        [Test]
+        public void ParallelCompilation()
+        {
+            var compiler = new Compiler();
+
+            Parallel.For(0, 100, i =>
+            {
+                var assembly = compiler.Compile(@"public string Foo(){ return ""HelloWorld""; }");
             });
         }
     }

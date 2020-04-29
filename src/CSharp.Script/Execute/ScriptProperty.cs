@@ -14,6 +14,8 @@ namespace CSharp.Script.Execute
         }
         public object ScriptObject { get; }
 
+        public string Name => _propertyInfo.Name;
+
         public Type Type => _propertyInfo.PropertyType;
 
         public TReturnType Get<TReturnType>()

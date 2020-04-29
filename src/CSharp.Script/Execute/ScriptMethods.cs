@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using CSharp.Script.Exceptions;
 
 namespace CSharp.Script.Execute
 {
-    public class ScriptMethods
+    public class ScriptMethods : IEnumerable<ScriptMethod>
     {
         private readonly Dictionary<string, ScriptMethod> _scriptMethods = new Dictionary<string, ScriptMethod>();
 
@@ -22,6 +23,8 @@ namespace CSharp.Script.Execute
                 _scriptMethods.Add(methodInfo.Name, new ScriptMethod(scriptObject, methodInfo));
             }
         }
+
+        public IEnumerable<string> Names => _scriptMethods.Keys;
 
         public bool Contains(string scriptMethodName)
         {
@@ -45,6 +48,19 @@ namespace CSharp.Script.Execute
             }
 
             return scriptMethod;
+        }
+
+        public IEnumerator<ScriptMethod> GetEnumerator()
+        {
+            foreach (var key in _scriptMethods.Keys)
+            {
+                yield return _scriptMethods[key];
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

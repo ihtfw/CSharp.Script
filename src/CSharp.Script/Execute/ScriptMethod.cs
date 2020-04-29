@@ -14,6 +14,8 @@ namespace CSharp.Script.Execute
             _methodInfo = methodInfo;
         }
 
+        public string Name => _methodInfo.Name;
+
         public TReturnType Invoke<TReturnType>(params object[] args)
         {
             return (TReturnType) Invoke(args);

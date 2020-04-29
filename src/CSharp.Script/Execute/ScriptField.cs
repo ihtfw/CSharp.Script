@@ -17,6 +17,8 @@ namespace CSharp.Script.Execute
 
         public Type Type => _fieldInfo.FieldType;
 
+        public string Name => _fieldInfo.Name;
+
         public TReturnType Get<TReturnType>()
         {
             return (TReturnType)Get();

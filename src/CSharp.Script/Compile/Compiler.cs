@@ -1,10 +1,12 @@
 ﻿using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using CSharp.Script.Exceptions;
+using CSharp.Script.Utils;
 using Microsoft.CSharp;
 
 namespace CSharp.Script.Compile
@@ -13,10 +15,14 @@ namespace CSharp.Script.Compile
     {
         private readonly UniqueNameGenerator _uniqueNameGenerator = new UniqueNameGenerator();
         readonly CSharpCodeProvider _codeProvider;
-        readonly CompilerParameters _parameters;
 
         public List<string> Usings { get; }
         public List<Assembly> References { get; }
+
+        /// <summary>
+        /// specify this if you want to use special folder for temp files
+        /// </summary>
+        public string BaseTempDir { get; set; }
 
         public Compiler() : this(Enumerable.Empty<string>(), Enumerable.Empty<Assembly>())
         {
@@ -28,20 +34,35 @@ namespace CSharp.Script.Compile
             References = references.ToList();
             
             _codeProvider = new CSharpCodeProvider();
+        }
 
-            _parameters = new CompilerParameters
+        private CompilerParameters CreateCompilerParameters()
+        {
+            var compilerParameters = new CompilerParameters
             {
                 GenerateInMemory = true
             };
-            
-            _parameters.ReferencedAssemblies.AddRange(References.Select(a => a.Location).ToArray());
+            compilerParameters.ReferencedAssemblies.AddRange(References.Select(a => a.Location).ToArray());
+            if (!string.IsNullOrEmpty(BaseTempDir))
+            {
+                if (!Directory.Exists(BaseTempDir))
+                {
+                    Directory.CreateDirectory(BaseTempDir);
+                    DirectoryUtils.TrySetDirectoryFullControl(BaseTempDir);
+                }
+
+                compilerParameters.TempFiles = new TempFileCollection(BaseTempDir, false);
+            }
+
+            return compilerParameters;
         }
 
         /// <inheritdoc />
         public virtual Assembly Compile(string sourceCode)
         {
             var fullSourceCode = BuildFullSourceCode(sourceCode);
-            CompilerResults results = _codeProvider.CompileAssemblyFromSource(_parameters, fullSourceCode);
+            var compilerParameters = CreateCompilerParameters();
+            CompilerResults results = _codeProvider.CompileAssemblyFromSource(compilerParameters, fullSourceCode);
 
             if (results.Errors.Count > 0)
             {

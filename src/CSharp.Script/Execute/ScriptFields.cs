@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using CSharp.Script.Exceptions;
 
 namespace CSharp.Script.Execute
 {
-    public class ScriptFields
+    public class ScriptFields : IEnumerable<ScriptField>
     {
         private readonly Dictionary<string, ScriptField> _scriptFields = new Dictionary<string, ScriptField>();
 
@@ -19,6 +20,7 @@ namespace CSharp.Script.Execute
                 _scriptFields.Add(fieldInfo.Name, new ScriptField(scriptObject, fieldInfo));
             }
         }
+        public IEnumerable<string> Names => _scriptFields.Keys;
 
         public IEnumerable<ScriptField> ForEachWhereType(Type propertyType)
         {
@@ -53,6 +55,19 @@ namespace CSharp.Script.Execute
             }
 
             return scriptMethod;
+        }
+
+        public IEnumerator<ScriptField> GetEnumerator()
+        {
+            foreach (var key in _scriptFields.Keys)
+            {
+                yield return _scriptFields[key];
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

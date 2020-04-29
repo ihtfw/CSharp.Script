@@ -32,10 +32,11 @@
     <DocumentationFile>bin\Release\CSharp.Script.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>Key.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -67,9 +68,8 @@
     <Compile Include="Execute\ScriptContainer.cs" />
     <Compile Include="Execute\ScriptMethod.cs" />
     <Compile Include="Compile\UniqueNameGenerator.cs" />
+    <Compile Include="Utils\DirectoryUtils.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="Key.snk" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

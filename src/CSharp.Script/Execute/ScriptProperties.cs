@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using CSharp.Script.Exceptions;
 
 namespace CSharp.Script.Execute
 {
-    public class ScriptProperties
+    public class ScriptProperties : IEnumerable<ScriptProperty>
     {
         private readonly Dictionary<string, ScriptProperty> _scriptProperties = new Dictionary<string, ScriptProperty>();
 
@@ -19,6 +20,8 @@ namespace CSharp.Script.Execute
                 _scriptProperties.Add(propertyInfo.Name, new ScriptProperty(scriptObject, propertyInfo));
             }
         }
+
+        public IEnumerable<string> Names => _scriptProperties.Keys;
 
         public bool Contains(string scriptPropertyName)
         {
@@ -53,6 +56,19 @@ namespace CSharp.Script.Execute
             }
 
             return scriptMethod;
+        }
+
+        public IEnumerator<ScriptProperty> GetEnumerator()
+        {
+            foreach (var key in _scriptProperties.Keys)
+            {
+                yield return _scriptProperties[key];
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }
