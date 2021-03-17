@@ -8,7 +8,7 @@ namespace CSharp.Script.Execute
 {
     public class ScriptMethods : IEnumerable<ScriptMethod>
     {
-        private readonly Dictionary<string, ScriptMethod> _scriptMethods = new Dictionary<string, ScriptMethod>();
+        private readonly Dictionary<string, ScriptMethod> _scriptMethods = new();
 
         public ScriptMethods(object scriptObject)
         {
@@ -16,13 +16,15 @@ namespace CSharp.Script.Execute
                 .GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
                 .Where(m => !m.IsSpecialName))
             {
-                if (_scriptMethods.ContainsKey(methodInfo.Name))
+                if (_scriptMethods.TryGetValue(methodInfo.Name, out var scriptMethod))
                 {
-                    throw new AlreadyExistsException($"Method {methodInfo.Name} already added");
+                    scriptMethod.AddOverload(methodInfo);
+                    continue;
                 }
                 _scriptMethods.Add(methodInfo.Name, new ScriptMethod(scriptObject, methodInfo));
             }
         }
+        public ScriptMethod this[string name] => Get(name);
 
         public IEnumerable<string> Names => _scriptMethods.Keys;
 

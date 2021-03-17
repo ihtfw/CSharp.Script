@@ -1,90 +1,90 @@
 ﻿using System;
-using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using CSharp.Script.Exceptions;
-using CSharp.Script.Utils;
-using Microsoft.CSharp;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Emit;
 
 namespace CSharp.Script.Compile
 {
     public class Compiler : ICompiler
     {
-        private readonly UniqueNameGenerator _uniqueNameGenerator = new UniqueNameGenerator();
-        readonly CSharpCodeProvider _codeProvider;
+        private readonly UniqueNameGenerator _uniqueNameGenerator = new();
 
         public List<string> Usings { get; }
         public List<Assembly> References { get; }
-
-        /// <summary>
-        /// specify this if you want to use special folder for temp files
-        /// </summary>
-        public string BaseTempDir { get; set; }
-
+        
         public Compiler() : this(Enumerable.Empty<string>(), Enumerable.Empty<Assembly>())
         {
-
         }
+
         public Compiler(IEnumerable<string> usings, IEnumerable<Assembly> references)
         {
             Usings = usings.ToList();
             References = references.ToList();
-            
-            _codeProvider = new CSharpCodeProvider();
         }
 
-        private CompilerParameters CreateCompilerParameters()
+        private IEnumerable<string> AssemblyLocations()
         {
-            var compilerParameters = new CompilerParameters
+            foreach (var reference in References)
             {
-                GenerateInMemory = true
-            };
-            compilerParameters.ReferencedAssemblies.AddRange(References.Select(a => a.Location).ToArray());
-            if (!string.IsNullOrEmpty(BaseTempDir))
-            {
-                if (!Directory.Exists(BaseTempDir))
-                {
-                    Directory.CreateDirectory(BaseTempDir);
-                    DirectoryUtils.TrySetDirectoryFullControl(BaseTempDir);
-                }
-
-                compilerParameters.TempFiles = new TempFileCollection(BaseTempDir, false);
+                yield return reference.Location;
             }
 
-            return compilerParameters;
+            yield return typeof(object).Assembly.Location;
+            yield return typeof(Enumerable).Assembly.Location;
         }
 
         /// <inheritdoc />
         public virtual Assembly Compile(string sourceCode)
         {
             var fullSourceCode = BuildFullSourceCode(sourceCode);
-            var compilerParameters = CreateCompilerParameters();
-            CompilerResults results = _codeProvider.CompileAssemblyFromSource(compilerParameters, fullSourceCode);
 
-            if (results.Errors.Count > 0)
+            var references = AssemblyLocations().Distinct().Select(path => MetadataReference.CreateFromFile(path)).ToArray();
+
+            SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(fullSourceCode);
+            var options = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
+            
+            CSharpCompilation compilation = CSharpCompilation.Create(
+                null,
+                syntaxTrees: new[] { syntaxTree },
+                references: references,
+                options: options);
+
+            using var ms = new MemoryStream();
+            
+            EmitResult result = compilation.Emit(ms);
+
+            if (result.Success)
             {
-                var compileErrors = new List<CompileError>();
-                string errors = "";
-                foreach (CompilerError compErr in results.Errors)
-                {
-                    if (!compErr.IsWarning)
-                    {
-                        errors += "Line number " + compErr.Line + ", Error Number: " + compErr.ErrorNumber + ", '" + compErr.ErrorText + ";" + Environment.NewLine + Environment.NewLine;
-                        compileErrors.Add(new CompileError(compErr));
-                    }
-                }
+                ms.Seek(0, SeekOrigin.Begin);
+                Assembly assembly = Assembly.Load(ms.ToArray());
 
-                if (compileErrors.Any())
-                {
-                    throw new CompileException(errors, compileErrors, sourceCode, fullSourceCode);
-                }
+                return assembly;
+            }
+            
+            var compileErrors = new List<CompileError>();
+            string errors = "";
+
+            IEnumerable<Diagnostic> failures = result.Diagnostics.Where(diagnostic =>
+                diagnostic.IsWarningAsError ||
+                diagnostic.Severity == DiagnosticSeverity.Error);
+
+            foreach (Diagnostic diagnostic in failures)
+            {
+                var compileError = new CompileError(diagnostic);
+
+                errors += "Line number " + compileError.Line + ", Error Number: " + compileError.ErrorNumber + ", '" +
+                          compileError.ErrorText + ";" + Environment.NewLine + Environment.NewLine;
+                
+                compileErrors.Add(compileError);
             }
 
-            var compiledAssembly = results.CompiledAssembly;
-            return compiledAssembly;
+            throw new CompileException(errors, compileErrors, sourceCode, fullSourceCode);
         }
 
         /// <inheritdoc />

@@ -9,11 +9,11 @@ namespace CSharp.Script.Compile
 {
     public class CompilerBuilder
     {
-        public HashSet<string> Usings { get; } = new HashSet<string>();
+        public HashSet<string> Usings { get; } = new();
 
-        public HashSet<Assembly> References { get; } = new HashSet<Assembly>();
+        public HashSet<Assembly> References { get; } = new();
 
-        public HashSet<Type> Types { get; } = new HashSet<Type>();
+        public HashSet<Type> Types { get; } = new();
         
         public virtual ICompiler Build()
         {

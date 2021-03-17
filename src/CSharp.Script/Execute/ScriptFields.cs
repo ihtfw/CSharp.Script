@@ -7,7 +7,7 @@ namespace CSharp.Script.Execute
 {
     public class ScriptFields : IEnumerable<ScriptField>
     {
-        private readonly Dictionary<string, ScriptField> _scriptFields = new Dictionary<string, ScriptField>();
+        private readonly Dictionary<string, ScriptField> _scriptFields = new();
 
         public ScriptFields(object scriptObject)
         {

@@ -45,11 +45,12 @@ namespace CSharp.Script.Tests.Compile
             sourceCodeBuilder.AppendLine(@"public int IntField;");
             sourceCodeBuilder.AppendLine(@"public string StringField;");
 
+            sourceCodeBuilder.AppendLine(@"public string LambdaProperty => ""hey!"";");
+
             var assembly = compiler.Compile(sourceCodeBuilder.ToString());
 
             Console.WriteLine(compiler.BuildFullSourceCode(sourceCodeBuilder.ToString()));
         }
-
         [Test]
         public void ExtendsSyntax()
         {
@@ -82,18 +83,6 @@ namespace CSharp.Script.Tests.Compile
             {
                 compiler.Compile("vpiruvnqeru9");
             });
-        }
-
-        [Test]
-        public void BaseTempDir()
-        {
-            var dir = TestContext.CurrentContext.WorkDirectory;
-            var compiler = new Compiler
-            {
-                BaseTempDir = dir
-            };
-            Console.WriteLine(dir);
-            var assembly = compiler.Compile(@"public string Foo(){ return ""HelloWorld""; }");
         }
 
         /// <summary>

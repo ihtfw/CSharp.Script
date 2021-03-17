@@ -6,7 +6,7 @@ namespace CSharp.Script.Compile
     public class CacheCompiler : ICompiler
     {
         private readonly ICompiler _compiler;
-        private readonly Dictionary<string, Assembly> _cache = new Dictionary<string, Assembly>();
+        private readonly Dictionary<string, Assembly> _cache = new();
 
         public CacheCompiler(ICompiler compiler)
         {

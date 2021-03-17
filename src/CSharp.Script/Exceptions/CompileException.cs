@@ -5,7 +5,7 @@ using CSharp.Script.Compile;
 
 namespace CSharp.Script.Exceptions
 {
-    public class CompileException : ApplicationException
+    public class CompileException : CSharpScriptException
     {
         public IReadOnlyList<CompileError> CompileErrors { get; }
 

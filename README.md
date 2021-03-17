@@ -1,5 +1,5 @@
 # CSharp.Script
-Simple library, that helps compile and execute C# code in runtime. For compile is used CSharpCodeProvider so no C#6 and higher features. If you want C#6 and higher use [Microsoft.CodeAnalysis.CSharp.Scripting](https://github.com/dotnet/roslyn/wiki/Scripting-API-Samples)
+Simple library, that helps compile and execute C# code in runtime. For compile is used [Microsoft.CodeAnalysis.CSharp](https://www.nuget.org/packages/Microsoft.CodeAnalysis.CSharp) pacakge so we can use up to C# 9.
 
 # Main idea
 All you have to do is to write methods, properties and fields, everything else will be done by framework.
@@ -72,11 +72,7 @@ compilerBuilder.Types.Add(typeof(MySuperClass));
 
 # Naming conventions
 ### SetDefaultValues method
-Because we can't use C#7 feature, that helps with initializing properties
-```csharp
-public int PropertyThatShouldBeInitialized { get; set; } = 3;
-```
-there is special method SetDefaultValues() to help with it
+There is special method SetDefaultValues()
 ```csharp
 public void SetDefaultValues(){ PropertyThatShouldBeInitialized = 3; }
 public int PropertyThatShouldBeInitialized { get; set; }
@@ -107,3 +103,5 @@ namespace UNGb67bdaca8048407eb33a8ec35ededec0
 ```
 don't forget to add using and refence to MySuperClass in such scenario.
 
+### Build package
+dotnet pack -c Release -p:PackageVersion=2021.3.17.1

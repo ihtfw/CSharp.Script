@@ -1,4 +1,4 @@
-﻿using System.CodeDom.Compiler;
+﻿using Microsoft.CodeAnalysis;
 
 namespace CSharp.Script.Compile
 {
@@ -9,12 +9,13 @@ namespace CSharp.Script.Compile
             
         }
 
-        internal CompileError(CompilerError compilerError)
+        internal CompileError(Diagnostic diagnostic)
         {
-            Line = compilerError.Line;
-            Column = compilerError.Column;
-            ErrorNumber = compilerError.ErrorNumber;
-            ErrorText = compilerError.ErrorText;
+            var startLinePosition = diagnostic.Location.GetLineSpan().StartLinePosition;
+            Line = startLinePosition.Line + 1;
+            Column = startLinePosition.Character;
+            ErrorNumber = diagnostic.Id;
+            ErrorText = diagnostic.GetMessage();
         }
 
         /// <summary>Gets or sets the line number where the source of the error occurs.</summary>

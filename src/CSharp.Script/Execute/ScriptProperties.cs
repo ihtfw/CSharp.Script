@@ -7,7 +7,7 @@ namespace CSharp.Script.Execute
 {
     public class ScriptProperties : IEnumerable<ScriptProperty>
     {
-        private readonly Dictionary<string, ScriptProperty> _scriptProperties = new Dictionary<string, ScriptProperty>();
+        private readonly Dictionary<string, ScriptProperty> _scriptProperties = new();
 
         public ScriptProperties(object scriptObject)
         {
@@ -20,6 +20,8 @@ namespace CSharp.Script.Execute
                 _scriptProperties.Add(propertyInfo.Name, new ScriptProperty(scriptObject, propertyInfo));
             }
         }
+
+        public ScriptProperty this[string name] => Get(name);
 
         public IEnumerable<string> Names => _scriptProperties.Keys;
 
