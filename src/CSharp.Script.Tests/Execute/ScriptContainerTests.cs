@@ -36,6 +36,16 @@ namespace CSharp.Script.Tests.Execute
             sourceCodeBuilder.AppendLine(@"public long LongField;");
             sourceCodeBuilder.AppendLine(@"public int IntField;");
             sourceCodeBuilder.AppendLine(@"public string StringField;");
+            sourceCodeBuilder.AppendLine(@"public int MethodWithAnonymousTypes()
+        {
+            var anonType = new
+            {
+                Foo = 10
+            };
+
+            return anonType.Foo;
+        }
+");
 
             var assembly = compiler.Compile(sourceCodeBuilder.ToString());
             _scriptContainer = new ScriptContainer(assembly);
@@ -101,6 +111,14 @@ namespace CSharp.Script.Tests.Execute
             Assert.AreEqual(0, _scriptContainer.Fields.Get("IntField").Get());
             Assert.AreEqual(3, _scriptContainer.Fields.Get("LongField").Get());
             Assert.AreEqual(null, _scriptContainer.Fields.Get("StringField").Get());
+        }
+
+        [Test]
+        public void MethodWithAnonymousTypes()
+        {
+            var result = _scriptContainer.Methods.Get("MethodWithAnonymousTypes").Invoke<int>();
+
+            Assert.AreEqual(10, result);
         }
     }
 }

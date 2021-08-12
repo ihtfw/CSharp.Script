@@ -10,8 +10,14 @@ namespace CSharp.Script.Execute
         /// Will use first type in assembly
         /// </summary>
         /// <param name="assembly"></param>
-        public ScriptContainer(Assembly assembly) : this(assembly.GetTypes().First())
+        public ScriptContainer(Assembly assembly) : this(SelectProperType(assembly))
         {
+        }
+
+        private static Type SelectProperType(Assembly assembly)
+        {
+            //If we've used anonymous type then it will be Generic, but we don't want this
+            return assembly.GetTypes().First(t => !t.IsGenericType && t.IsClass);
         }
 
         /// <summary>
